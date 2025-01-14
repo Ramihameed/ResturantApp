@@ -1,4 +1,6 @@
-﻿namespace ResturantApp.Models
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+
+namespace ResturantApp.Models
 {
     public class Ingredient
     {
@@ -6,6 +8,7 @@
 
         public string name { get; set; }
 
+        [ValidateNever]
         public ICollection<ProductIngredient> ProductsIngredients { get; set; }
 
     }
