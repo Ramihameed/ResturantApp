@@ -24,6 +24,15 @@ namespace ResturantApp.Controllers
             return View(await ingredients.GetByIdAsync(id, new QueryOptions<Ingredient>() {Includes = "ProductsIngredients.Product" }));
                                                                   
         }
+
+        // Ingredient/Create
+
+        [HttpGet]
+
+        public IActionResult Create(int id)
+        {
+            return View();
+        }
     }
 }
 

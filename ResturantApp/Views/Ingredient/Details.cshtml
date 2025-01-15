@@ -3,6 +3,47 @@
 @{
 	ViewBag.Title = "Ingredient Details";
 }
-
+<a asp-action="Create">Create New Ingredient</a>
 <h1>@Model.name details</h1>
+
+@if (Model.ProductsIngredients != null && Model.ProductsIngredients.Any()) 
+{
+	<h4> Products </h4>
+
+	<table class="table">
+
+		<thead>
+
+			<tr>
+
+				<th>Product Name</th>
+				<th>Description</th>
+				<th>Price</th>
+
+
+			</tr>
+
+
+		</thead>
+
+		<tbody>
+
+			@foreach (var ProductIngredient in Model.ProductsIngredients)
+			{
+				<tr>
+
+					<td>@ProductIngredient.Product.Name</td>
+					<td>@ProductIngredient.Product.Description</td>
+					<td>@ProductIngredient.Product.Price</td>
+
+				</tr>
+			}
+
+		</tbody>
+	</table>
+
+}
+
+<a asp-action="Index"> Back To List </a>
+
 
