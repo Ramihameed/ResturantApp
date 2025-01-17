@@ -3,3 +3,14 @@
 @{
 	ViewBag.Title = $"Delete {Model.name} Ingredient";
 }
+
+<h3>Are You Sure You Want To Delete @Model.name</h3>
+<div>
+<form asp-action="Delete" method="post" >
+
+	<input type="hidden" asp-for= "IngredientId"/>
+	<input type="submit" value="Delete" class=" btn btn-danger"/>
+	<a asp-action="Index" class="btn btn-default">Back To List</a>
+
+</form>
+</div>
