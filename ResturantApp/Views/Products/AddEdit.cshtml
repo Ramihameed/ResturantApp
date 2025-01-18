@@ -8,7 +8,7 @@
 
 
 <form asp-action="AddEdit" method="post" enctype="multipart/form-data">
-	
+
 	<input type="hidden" asp-for="ProductId" />
 	<input type="hidden" asp-for="CategoryId" />
 	<div class="form-group">
@@ -46,5 +46,42 @@
 
 		<label for="ImageUpload">Upload Image</label>
 		<input type="file" class="form-control" id="ImageUpload" name="ImageFile" asp-for="ImageFile" />
+	</div>
+
+	<div class="row">
+
+		<div class="col">
+
+			@foreach (Category category in ViewBag.Category) {
+
+				<div class="form-check">
+
+					@{
+						bool ischecked = Model.CategoryId == category.CategoryId;
+					}
+					<input type="radio" class="form-check-input" id= @category.CategoryId name="catId" value="@category.CategoryId" @(ischecked ? "checked" : "") /> @category.CategoryName
+				</div>
+			}
+
+
+		</div>
+
+		@foreach (Ingredient ingredient in ViewBag.Ingredients) 
+		{
+			<div class="form-check">
+
+				@{
+					bool ischecked = Model.ProductIngredients != null && Model.ProductIngredients.Any(i => i.IngredientId == ingredient.IngredientId);
+				}
+				<input type="checkbox" class="form-check-input" id="@ingredient.IngredientId" name="IngredientIds" value="@ingredient.IngredientId" 
+				@(ischecked ? "checked" : "")/>
+				<label class="form-check-label" for="@ingredient.IngredientId">@ingredient.name</label>
+				
+			</div>
+		}
+		 
+		<div class="col"></div>
+
+
 	</div>
 </form>
