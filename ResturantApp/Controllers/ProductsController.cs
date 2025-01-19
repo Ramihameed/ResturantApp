@@ -12,11 +12,14 @@ namespace ResturantApp.Controllers
         private Repository<Ingredient> Ingredients;
 
         private Repository<Category> Category;
-        public ProductsController(ApplicationDbContext context)
+
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ProductsController(ApplicationDbContext context , IWebHostEnvironment webHostEnvironment)
         {
             this.Product = new Repository<Product>(context);
             this.Ingredients = new Repository<Ingredient>(context);
             this.Category = new Repository<Category>(context);
+            this._webHostEnvironment = webHostEnvironment;
         }
         public async Task<IActionResult> Index()
         {
@@ -41,6 +44,57 @@ namespace ResturantApp.Controllers
                 return View();
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddEdit(Product product , int[] IngredientIds , int catId)
+        {
+            if (ModelState.IsValid) 
+            {
+                if (product.ImageFile != null)
+                {
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + product.ImageFile.FileName;
+                    string FilePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var FileStream = new FileStream(FilePath, FileMode.Create) )
+
+                    {
+                        await product.ImageFile.CopyToAsync(FileStream);
+                    }
+
+                    product.ImageUrl = uniqueFileName;
+                }
+
+                if (product.ProductId == 0 )
+                {
+                    ViewBag.Ingredients = await Ingredients.GetAllAsync();
+
+                    ViewBag.Category = await Category.GetAllAsync();
+
+                    product.CategoryId = catId;
+
+                    foreach (int i in IngredientIds) 
+                    {
+                        product.ProductIngredients?.Add(new  ProductIngredient { ProductId = i, IngredientId = i });
+
+                    }
+
+                    await Product.AddAsync(product);
+                    return RedirectToAction("Index","Products");
+
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Products");
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "Products");
+            }
+
+
+        } 
     }
 }
 
