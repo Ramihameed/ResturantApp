@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ResturantApp.Data;
 using ResturantApp.Models;
 
@@ -85,6 +86,36 @@ namespace ResturantApp.Controllers
                 }
                 else
                 {
+                    var existingProduct = await Product.GetByIdAsync(product.ProductId , new QueryOptions<Product> { Includes = "ProductIngredients" });
+
+                    if (existingProduct == null )
+                    {
+                        ModelState.AddModelError("", "Product Not Found");
+
+                        ViewBag.Ingredients = await Ingredients.GetAllAsync();
+
+                        ViewBag.Category = await Category.GetAllAsync();
+
+                        return View(product);
+                    }
+
+                    existingProduct.Name = product.Name;
+                    existingProduct.Description = product.Description;
+                    existingProduct.Price = product.Price;
+                    existingProduct.Stock = product.Stock;
+                    existingProduct.CategoryId = catId ;
+
+                    // update products Ingredients
+
+                    existingProduct.ProductIngredients?.Clear();
+
+                    foreach (int id in IngredientIds)
+
+                    {
+                        product.ProductIngredients?.Add(new ProductIngredient { ProductId = product.ProductId, IngredientId = id });
+
+                    }
+
                     return RedirectToAction("Index", "Products");
                 }
             }
@@ -94,9 +125,14 @@ namespace ResturantApp.Controllers
             }
 
 
-        } 
+        }
+
+
     }
+
+
 }
+
 
 
 

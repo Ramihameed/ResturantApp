@@ -7,6 +7,12 @@ namespace ResturantApp.Models
 {
     public class Product
     {
+
+
+        public Product()
+        {
+            this.ProductIngredients = new List<ProductIngredient>();
+        }
         public int ProductId { get; set; }
 
         public string? Name { get; set; }
