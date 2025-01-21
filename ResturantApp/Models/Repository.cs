@@ -58,7 +58,6 @@ namespace ResturantApp.Models
         }
         public async Task UpdateAsync(T entity)
         {
-            _context.Update(entity);
             await _context.SaveChangesAsync();
         }
     }

@@ -16,7 +16,7 @@
 	}
 }
 <h2>Resturant Menu Items</h2>
-<a asp-action="AddEdit" asp-controller="Products" class="btn btn-primary"> AddEdit Item</a>
+<a asp-action="AddEdit" asp-controller="Products" class="btn btn-primary"> Create New Item</a>
 <div class="row">
 
 	@foreach (Product prod in Model)
@@ -33,6 +33,7 @@
 						<p class=" card-text">@prod?.Description</p>
 						<p class=" card-text">@prod?.Price.ToString("C")</p>
 						<p class=" card-text">Quantity in stock: @prod?.Stock</p>
+						<a class="btn btn-primary" asp-controller="Products" asp-action="AddEdit" asp-route-id="@prod.ProductId"><i class="bi bi-pencil-fill">Edit</i></a> 
 						<!-- Button trigger modal bootstrap -->
 						<a class="btn btn-danger" asp-controller="Products" asp-action="Delete" data-bs-toggle="modal" data-bs-target="@GetDeleteModalId(prod)">
 							<i class="bi bi-trash">Delete @prod.Name</i>

@@ -1,10 +1,13 @@
 ﻿@model Product
 
 @{
-	ViewBag.Title = $"{ViewBag.Operation} Menu Item";
+	ViewBag.Title = $"{ViewBag.Operation}" + "  " + Model.Name;
 }
 
-<h1> @ViewBag.Operation Menu Item </h1>
+<h1>
+	@ViewBag.Operation @(string.IsNullOrEmpty(Model.Name) ? "New" : Model.Name)
+	Menu Item
+</h1>
 
 
 <form asp-action="AddEdit" method="post" enctype="multipart/form-data">

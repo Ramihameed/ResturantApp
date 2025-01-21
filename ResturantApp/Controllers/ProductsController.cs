@@ -30,7 +30,7 @@ namespace ResturantApp.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> AddEdit(int id)
+        public async Task<IActionResult> AddEdit(int id , Product product)
         {
             ViewBag.Ingredients = await Ingredients.GetAllAsync();
             ViewBag.Category = await Category.GetAllAsync();
@@ -41,8 +41,9 @@ namespace ResturantApp.Controllers
             }
             else
             {
+                product = Product.GetByIdAsync(id, new QueryOptions<Product> { Includes = "ProductIngredients" }).Result;
                 ViewBag.Operation = "Edit";
-                return View();
+                return View(product);
             }
         }
 
@@ -88,7 +89,7 @@ namespace ResturantApp.Controllers
                 {
                     var existingProduct = await Product.GetByIdAsync(product.ProductId , new QueryOptions<Product> { Includes = "ProductIngredients" });
 
-                    if (existingProduct == null )
+                    if (existingProduct == null)
                     {
                         ModelState.AddModelError("", "Product Not Found");
 
@@ -98,24 +99,29 @@ namespace ResturantApp.Controllers
 
                         return View(product);
                     }
-
-                    existingProduct.Name = product.Name;
-                    existingProduct.Description = product.Description;
-                    existingProduct.Price = product.Price;
-                    existingProduct.Stock = product.Stock;
-                    existingProduct.CategoryId = catId ;
-
-                    // update products Ingredients
-
-                    existingProduct.ProductIngredients?.Clear();
-
-                    foreach (int id in IngredientIds)
-
+                    else
                     {
-                        product.ProductIngredients?.Add(new ProductIngredient { ProductId = product.ProductId, IngredientId = id });
 
+
+
+                        existingProduct.Name = product.Name;
+                        existingProduct.Description = product.Description;
+                        existingProduct.Price = product.Price;
+                        existingProduct.Stock = product.Stock;
+                        existingProduct.CategoryId = catId;
+
+                        // update products Ingredients
+
+                        existingProduct.ProductIngredients?.Clear();
+
+                        foreach (int id in IngredientIds)
+
+                        {
+                            product.ProductIngredients?.Add(new ProductIngredient { ProductId = product.ProductId, IngredientId = id });
+
+                        }
+                        await Product.UpdateAsync(existingProduct);
                     }
-
                     return RedirectToAction("Index", "Products");
                 }
             }
