@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ResturantApp.Data;
 using ResturantApp.Models;
@@ -15,7 +16,7 @@ namespace ResturantApp.Controllers
         private Repository<Category> Category;
 
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public ProductsController(ApplicationDbContext context , IWebHostEnvironment webHostEnvironment)
+        public ProductsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             this.Product = new Repository<Product>(context);
             this.Ingredients = new Repository<Ingredient>(context);
@@ -30,7 +31,7 @@ namespace ResturantApp.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> AddEdit(int id , Product product)
+        public async Task<IActionResult> AddEdit(int id, Product product)
         {
             ViewBag.Ingredients = await Ingredients.GetAllAsync();
             ViewBag.Category = await Category.GetAllAsync();
@@ -48,9 +49,9 @@ namespace ResturantApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddEdit(Product product , int[] IngredientIds , int catId)
+        public async Task<IActionResult> AddEdit(Product product, int[] IngredientIds, int catId)
         {
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
                 if (product.ImageFile != null)
                 {
@@ -58,7 +59,7 @@ namespace ResturantApp.Controllers
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + product.ImageFile.FileName;
                     string FilePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                    using (var FileStream = new FileStream(FilePath, FileMode.Create) )
+                    using (var FileStream = new FileStream(FilePath, FileMode.Create))
 
                     {
                         await product.ImageFile.CopyToAsync(FileStream);
@@ -67,7 +68,7 @@ namespace ResturantApp.Controllers
                     product.ImageUrl = uniqueFileName;
                 }
 
-                if (product.ProductId == 0 )
+                if (product.ProductId == 0)
                 {
                     ViewBag.Ingredients = await Ingredients.GetAllAsync();
 
@@ -75,19 +76,19 @@ namespace ResturantApp.Controllers
 
                     product.CategoryId = catId;
 
-                    foreach (int i in IngredientIds) 
+                    foreach (int i in IngredientIds)
                     {
-                        product.ProductIngredients?.Add(new  ProductIngredient { ProductId = i, IngredientId = i });
+                        product.ProductIngredients?.Add(new ProductIngredient { ProductId = i, IngredientId = i });
 
                     }
 
                     await Product.AddAsync(product);
-                    return RedirectToAction("Index","Products");
+                    return RedirectToAction("Index", "Products");
 
                 }
                 else
                 {
-                    var existingProduct = await Product.GetByIdAsync(product.ProductId , new QueryOptions<Product> { Includes = "ProductIngredients" });
+                    var existingProduct = await Product.GetByIdAsync(product.ProductId, new QueryOptions<Product> { Includes = "ProductIngredients" });
 
                     if (existingProduct == null)
                     {
@@ -131,12 +132,55 @@ namespace ResturantApp.Controllers
             }
 
 
+
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id == 0)
+            {
+                return BadRequest(new { Message = "Invalid Product ID!" });
+            }
+
+            // Find the product by ID
+            var product = await Product.GetByIdAsync(id, new QueryOptions<Product> { Includes = "ProductIngredients" });
+
+            if (product == null)
+            {
+                return NotFound(new { Message = "Product not found!" });
+            }
+
+            return View(product);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (id == 0)
+            {
+                return BadRequest(new { Message = "Invalid Product ID!" });
+            }
+
+            var product = await Product.GetByIdAsync(id, new QueryOptions<Product> { Includes = "ProductIngredients" });
+
+            if (product == null)
+            {
+                return NotFound(new { Message = "Product not found!" });
+            }
+
+            // Delete the product
+            await Product.DeleteAsync(product.ProductId);
+
+            return RedirectToAction("Index", "Products");
+        }
+
+
+
     }
-
-
 }
 
 
