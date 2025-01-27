@@ -16,14 +16,23 @@ html {
   position: relative;
   min-height: 100%;
 }
-
-body {
-  margin-bottom: 60px;
-}
-
 .fixed-image-height {
 
     height : 200px;
     object-fit : cover;
     width : 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensures that the body takes at least the full height of the viewport */
+}
+
+main {
+    flex-grow: 1; /* This makes sure that the main content takes the available space, pushing the footer to the bottom */
+}
+
+footer {
+    margin-top: auto; /* Push the footer to the bottom if the content is small */
 }
